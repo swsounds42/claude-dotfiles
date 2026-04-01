@@ -119,6 +119,21 @@ else
   fi
 fi
 
+# ─── Install Slidev skill (large, cloned from upstream) ──────
+echo ""
+read -rp "Install Slidev presentation skill? (99MB clone) [y/N]: " INSTALL_SLIDEV
+if [[ "${INSTALL_SLIDEV,,}" == "y" ]]; then
+  SLIDEV_DST="$CLAUDE_DIR/skills/slidev"
+  if [[ -d "$SLIDEV_DST" ]]; then
+    echo "  Slidev already exists at $SLIDEV_DST, skipping"
+  else
+    mkdir -p "$CLAUDE_DIR/skills"
+    echo "  Cloning slidevjs/slidev..."
+    git clone --depth 1 https://github.com/slidevjs/slidev.git "$SLIDEV_DST"
+    echo "  INSTALLED: $SLIDEV_DST"
+  fi
+fi
+
 # ─── Post-install instructions ────────────────────────────────
 echo ""
 echo "======================================================"
@@ -129,19 +144,15 @@ echo "1. Install GSD (Get Shit Done skill system):"
 echo "   Open Claude Code and run: /gsd:update"
 echo "   This installs commands/gsd/ and hooks/gsd-check-update.js"
 echo ""
-echo "2. Install the Slidev skill (large — cloned separately):"
-echo "   git clone https://github.com/YOUR_SLIDEV_REPO ~/.claude/skills/slidev"
-echo "   (Or ask Claude where to get it)"
-echo ""
-echo "3. Install plugins:"
+echo "2. Install plugins:"
 echo "   Open Claude Code and run: claude plugin install slack@claude-plugins-official"
 echo ""
-echo "4. Salesforce MCP — if you use it:"
+echo "3. Salesforce MCP — if you use it:"
 echo "   cd $PERSONAL_OS_PATH/core/mcp"
 echo "   python3 -m venv .venv && source .venv/bin/activate"
 echo "   pip install -r requirements.txt"
 echo ""
-echo "5. Verify settings.json looks correct:"
+echo "4. Verify settings.json looks correct:"
 echo "   cat $CLAUDE_DIR/settings.json"
 echo ""
 echo "That's it. Open Claude Code and you should be good to go."

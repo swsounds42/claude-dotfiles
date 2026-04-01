@@ -43,9 +43,9 @@ Open Claude Code → run /gsd:update
 ```
 This installs `commands/gsd/` and the `gsd-check-update.js` session hook.
 
-**Slidev skill** — markdown-based presentation builder (large, separate repo):
+**Slidev skill** — bootstrap prompts to install this (99MB), or manually:
 ```bash
-git clone [slidev-repo-url] ~/.claude/skills/slidev
+git clone --depth 1 https://github.com/slidevjs/slidev.git ~/.claude/skills/slidev
 ```
 
 **Salesforce MCP** — if you use the Salesforce integration:
