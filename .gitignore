@@ -1,0 +1,30 @@
+# Secrets
+settings.json
+.env
+
+# Reinstallable (GSD installs these)
+commands/gsd/
+get-shit-done/
+gsd-file-manifest.json
+package.json
+
+# Large reinstallable skill (clone separately)
+skills/slidev/
+
+# Ephemeral / machine-specific
+cache/
+sessions/
+session-env/
+shell-snapshots/
+telemetry/
+todos/
+debug/
+backups/
+plans/
+plugins/
+projects/
+history.jsonl
+stats-cache.json
+mcp-needs-auth-cache.json
+remote-settings.json
+*.log

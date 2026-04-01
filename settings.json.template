@@ -1,0 +1,42 @@
+{
+  "mcpServers": {
+    "salesforce": {
+      "command": "{{HOME}}/.venv/bin/python3",
+      "args": ["{{PERSONAL_OS_PATH}}/core/mcp/salesforce_mcp.py"],
+      "env": {
+        "SALESFORCE_CLIENT_ID": "{{SALESFORCE_CLIENT_ID}}",
+        "SALESFORCE_CLIENT_SECRET": "{{SALESFORCE_CLIENT_SECRET}}",
+        "SALESFORCE_INSTANCE_URL": "{{SALESFORCE_INSTANCE_URL}}"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "slack@claude-plugins-official": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{HOME}}/.claude/hooks/gsd-check-update.js\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{HOME}}/.claude/hooks/context-watchdog.js\""
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node \"{{HOME}}/.claude/hooks/context-statusline.js\""
+  }
+}
