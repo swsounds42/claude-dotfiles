@@ -134,6 +134,33 @@ if [[ "${INSTALL_SLIDEV,,}" == "y" ]]; then
   fi
 fi
 
+# ─── Install marketplace skills (skills.sh) ─────────────────
+echo ""
+echo "Installing marketplace skills from skills.sh..."
+echo "(34 marketing + 14 superpowers + 95 Google Workspace)"
+
+if command -v npx &>/dev/null; then
+  npx skills add coreyhaines31/marketingskills -y -g 2>&1 | tail -1
+  npx skills add obra/superpowers -y -g 2>&1 | tail -1
+  npx skills add googleworkspace/cli -y -g 2>&1 | tail -1
+  echo "  INSTALLED: 143 marketplace skills"
+else
+  echo "  SKIP: npx not found — install Node.js first, then rerun"
+fi
+
+# ─── Install gws CLI (Google Workspace) ──────────────────────
+echo ""
+read -rp "Install Google Workspace CLI (gws) via Homebrew? [y/N]: " INSTALL_GWS
+if [[ "${INSTALL_GWS,,}" == "y" ]]; then
+  if command -v brew &>/dev/null; then
+    brew install googleworkspace-cli
+    echo "  INSTALLED: gws $(gws --version 2>/dev/null | head -1)"
+    echo "  Run 'gws auth login' after setup to authenticate"
+  else
+    echo "  SKIP: Homebrew not found"
+  fi
+fi
+
 # ─── Post-install instructions ────────────────────────────────
 echo ""
 echo "======================================================"
@@ -152,7 +179,11 @@ echo "   cd $PERSONAL_OS_PATH/core/mcp"
 echo "   python3 -m venv .venv && source .venv/bin/activate"
 echo "   pip install -r requirements.txt"
 echo ""
-echo "4. Verify settings.json looks correct:"
+echo "4. Google Workspace CLI — if installed:"
+echo "   gws auth setup --login"
+echo "   (Requires GCP project with OAuth client)"
+echo ""
+echo "5. Verify settings.json looks correct:"
 echo "   cat $CLAUDE_DIR/settings.json"
 echo ""
 echo "That's it. Open Claude Code and you should be good to go."

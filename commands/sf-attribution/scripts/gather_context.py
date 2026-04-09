@@ -24,7 +24,7 @@ CLIENT_ID, CLIENT_SECRET, INSTANCE_URL = load_sf_credentials()
 API_VERSION = "v62.0"
 
 # ── Config ────────────────────────────────────────────────────────────────────
-RECORD_TYPES = ("VSB", "Title", "Insurance")
+RECORD_TYPES = ("VSB", "Title", "Insurance", "New_Business", "Teams")
 EXCLUDE_DEMO_TYPES = ()  # Include all demo types including REA Direct
 OUTPUT_PATH = "/tmp/sf_attribution_context.json"
 SF_BASE_URL = INSTANCE_URL
@@ -110,7 +110,7 @@ def main():
                    Engage_Flow_Name__c
             FROM Opportunity
             WHERE RecordType.Name IN ({rt_filter})
-              AND LeadSource = null
+              AND (LeadSource = null OR Lead_Source_Detail__c = null)
               {demo_clause}
               AND CreatedDate >= {since_str}
             ORDER BY CreatedDate DESC
@@ -173,6 +173,31 @@ def main():
                 role = (r.get("UserRole") or {}).get("Name", "")
                 booked_by_names[r["Id"]] = {"name": r["Name"], "role": role}
 
+        # ── Step 4b: Get last-conversion UTM fields from Contact ─────────
+        contact_utms = {}
+        if contact_ids:
+            for i in range(0, len(contact_ids), 20):
+                chunk = contact_ids[i:i + 20]
+                id_str = "','".join(chunk)
+                try:
+                    recs = soql_query(client, headers, f"""
+                        SELECT Id, Email, lc_utm_source__c, lc_utm_medium__c,
+                               lc_utm_campaign__c, lc_utm_content__c, lc_utm_term__c
+                        FROM Contact
+                        WHERE Id IN ('{id_str}')
+                    """)
+                    for r in recs:
+                        contact_utms[r["Id"]] = {
+                            "email": r.get("Email"),
+                            "lc_utm_source": r.get("lc_utm_source__c"),
+                            "lc_utm_medium": r.get("lc_utm_medium__c"),
+                            "lc_utm_campaign": r.get("lc_utm_campaign__c"),
+                            "lc_utm_content": r.get("lc_utm_content__c"),
+                            "lc_utm_term": r.get("lc_utm_term__c"),
+                        }
+                except Exception as e:
+                    print(f"Warning: couldn't fetch contact UTMs: {e}")
+
         # ── Step 5: Get recent tasks/activities on the contacts ───────────
         contact_activities = {}
         if contact_ids:
@@ -201,9 +226,11 @@ def main():
         try:
             recs = soql_query(client, headers, f"""
                 SELECT Id, Name, Type FROM Campaign
-                WHERE Type IN ('Outreach Sequence', 'Demo Request', 'Hunting License Sign Ups',
+                WHERE (Type IN ('Outreach Sequence', 'Demo Request', 'Hunting License Sign Ups',
                                'Event (3rd Party)', 'Event (In-House)', 'Event (Webinar)',
-                               'Direct Sign-Ups', 'Inside Sales')
+                               'Direct Sign-Ups', 'Inside Sales', 'Umbrella',
+                               'Nurture Campaign', 'Contact Us Requests', 'Workshop')
+                    OR Name LIKE '%Churn Winback%')
                 AND Name LIKE '%{quarter_label}%'
                 ORDER BY Type, Name
             """)
@@ -265,6 +292,10 @@ def main():
                         "type": act.get("Type"),
                     })
 
+            # Contact-level last-conversion UTMs and email
+            lc_utms = contact_utms.get(contact_id, {}) if contact_id else {}
+            contact_email = lc_utms.pop("email", None) if lc_utms else None
+
             results.append({
                 "opp_id": opp["Id"],
                 "opp_name": opp["Name"],
@@ -289,6 +320,8 @@ def main():
                 },
                 "campaign_id_on_opp": opp.get("CampaignId"),
                 "contact_id": contact_id,
+                "contact_email": contact_email,
+                "contact_utms": lc_utms,
                 "campaign_memberships": campaign_list,
                 "recent_activities": activities,
             })
