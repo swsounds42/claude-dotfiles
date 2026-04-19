@@ -1,35 +1,38 @@
 # claude-dotfiles
 
-Portable backup of my `~/.claude/` configuration. Clone this on any machine to bootstrap a full Claude Code setup with all agents, skills, hooks, and commands in place.
+A portable backup of a working `~/.claude/` configuration. Clone on any
+machine, run `bootstrap.sh`, and you have a full Claude Code setup — agents,
+skills, hooks, and slash commands — wired up in under a minute.
 
-## What's included
+This is the tooling layer behind [samwarren.io](https://samwarren.io) and the
+**Cascade** personal operations system.
+
+## What you get
 
 | Path | Contents |
 |------|----------|
-| `CLAUDE.md` | Global Claude instructions — Jarvis persona, auto-routing rules, working style |
-| `agents/` | 142 specialist agent definitions (react-specialist, python-pro, devops-engineer, etc.) |
-| `commands/` | 36 slash commands — n8n, content writing, design, SF attribution, HubSpot ops, prompts |
-| `hooks/` | `context-statusline.js` and `context-watchdog.js` — context window monitoring |
-| `skills/ui-ux-pro-max/` | UI/UX design intelligence + 58 brand design references (Stripe, Linear, Airbnb, etc.) |
+| `CLAUDE.md` | Global auto-routing rules — which skill handles which kind of request |
+| `agents/` | 142 specialist subagent definitions (react-specialist, python-pro, devops-engineer, etc.) |
+| `commands/` | 38 slash commands — n8n, content writing, design, prompts, Slack |
+| `hooks/` | `context-statusline.js` + `context-watchdog.js` — context window monitoring |
+| `skills/ui-ux-pro-max/` | UI/UX design intelligence + 58 brand design references |
 | `skills/brand/` | Brand voice, visual identity, messaging frameworks |
-| `skills/design-system/` | Token architecture, component specifications, spacing/typography scales |
-| `skills/frontend-slides/` | Frontend slides skill for HTML presentation generation |
+| `skills/design-system/` | Token architecture, component specs, spacing/typography scales |
+| `skills/frontend-slides/` | HTML presentation generation |
+| `skills/humanizer/` | Removes AI-writing tells from text |
+| `skills/last30days/` | Recent social sentiment research across Reddit, X, YouTube, HN |
 | `settings.json.template` | Claude settings with secrets and paths replaced by `{{PLACEHOLDER}}` variables |
 
-**Installed by bootstrap (not stored in repo):**
-- 143 marketplace skills via `npx skills add` (34 marketing, 14 superpowers, 95 Google Workspace)
-- `commands/gsd/` — GSD installs this via `/gsd:update`
-- `skills/slidev/` — Large skill, cloned separately
-- `gws` CLI — Google Workspace CLI, installed via Homebrew
-- All ephemeral dirs: `cache/`, `sessions/`, `projects/`, etc.
+**Installed by `bootstrap.sh` (not stored in this repo):**
 
-### Marketplace skills (auto-installed)
-
-| Source | Count | What |
-|--------|-------|------|
-| `coreyhaines31/marketingskills` | 34 | RevOps, CRO suite, SEO, copywriting, pricing, churn, analytics, sales enablement |
-| `obra/superpowers` | 14 | Systematic debugging, TDD, parallel agent dispatch, verification, code review |
-| `googleworkspace/cli` | 95 | Gmail, Calendar, Drive, Docs, Sheets, Tasks, Meet + workflow automations + recipes |
+- **143 marketplace skills** via `npx skills add`:
+  - `coreyhaines31/marketingskills` (34 skills — RevOps, CRO, SEO, copywriting)
+  - `obra/superpowers` (14 skills — systematic debugging, TDD, parallel agent dispatch)
+  - `googleworkspace/cli` (95 skills — Gmail, Calendar, Drive, Docs, Sheets)
+- `commands/gsd/` (GSD installs itself via `/gsd:update`)
+- `skills/slidev/` (large, cloned separately)
+- `gws` CLI (Google Workspace CLI, via Homebrew)
+- Everything ephemeral: `cache/`, `sessions/`, `projects/`, `todos/`, `telemetry/`
 
 ## Quick start
 
@@ -40,54 +43,47 @@ cd ~/Desktop/claude-dotfiles
 ```
 
 The bootstrap script will:
-1. Detect your OS
-2. Ask for optional Salesforce MCP credentials (skip if you don't use it)
+
+1. Detect your OS (macOS or Linux)
+2. Ask for optional Salesforce MCP credentials (press Enter to skip)
 3. Symlink `agents/`, `commands/`, `hooks/`, `skills/`, and `CLAUDE.md` into `~/.claude/`
-4. Generate `~/.claude/settings.json` from the template with your paths and credentials filled in
-5. Install 143 marketplace skills from skills.sh (marketing, superpowers, Google Workspace)
-6. Optionally install Slidev skill and `gws` CLI
+4. Generate `~/.claude/settings.json` from the template, substituting your paths and credentials
+5. Install 143 marketplace skills
+6. Optionally install Slidev + the `gws` CLI
 
 ## After bootstrap
 
-A few things that need manual setup:
+A few things need manual setup:
 
-**GSD (Get Shit Done)** — the structured planning skill system:
+**GSD (Get Shit Done)** — the structured planning skill system that turns big projects into goal-backward plans with atomic commits:
+
 ```
-Open Claude Code -> run /gsd:update
+Open Claude Code → run /gsd:update
 ```
+
 This installs `commands/gsd/` and the `gsd-check-update.js` session hook.
 
 **Google Workspace CLI** — if you want Gmail/Calendar/Drive automation:
+
 ```bash
-# Auth setup (requires GCP project with OAuth client)
 gws auth setup --login
 ```
 
-**Salesforce MCP** — if you use the Salesforce integration:
-```bash
-cd ~/Desktop/personal-os-main/core/mcp
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+(Requires a GCP project with an OAuth client.)
 
 **Plugins:**
+
 ```
 claude plugin install slack@claude-plugins-official
 ```
 
-## Total brain surface area
+## Why symlinks instead of copies?
 
-| Layer | Count |
-|-------|-------|
-| Skills (knowledge files) | 148 (5 custom + 143 marketplace) |
-| Commands (slash commands) | 36 |
-| Specialist agents | 142 |
-| Brand design references | 58 (on-demand via `npx getdesign@latest add <name>`) |
+`bootstrap.sh` symlinks `agents/`, `commands/`, `hooks/`, `skills/`, and
+`CLAUDE.md` into `~/.claude/` rather than copying. So when you update this
+repo, the changes are live in `~/.claude/` immediately — no re-run needed.
 
-## Keeping it up to date
-
-When you update your Claude config on your main machine:
+On your main machine:
 
 ```bash
 cd ~/Desktop/claude-dotfiles
@@ -96,15 +92,42 @@ git commit -m "update: [what changed]"
 git push
 ```
 
-On another machine:
+On any other machine:
+
 ```bash
 git pull
-# Re-run bootstrap only if settings.json.template changed or new marketplace skills added
-./bootstrap.sh
 ```
 
-Since `agents/`, `commands/`, `hooks/`, and `skills/` are symlinked (not copied), any `git pull` immediately reflects in `~/.claude/` — no re-run needed for most changes.
+Re-run `bootstrap.sh` only if `settings.json.template` changed or new
+marketplace skills got added to `skills.sh`.
 
-## Repo is private
+## Surface area
 
-Contains personal configuration, agent routing logic, and workflow files. Keep it private.
+| Layer | Count |
+|-------|-------|
+| Skills (knowledge files) | 148 (5 custom + 143 marketplace) |
+| Commands (slash commands) | 38 |
+| Specialist agents | 142 |
+| Brand design references | 58 (via `npx getdesign@latest add <name>`) |
+
+## What's not included
+
+Proprietary skills and workflows tied to specific companies or revenue
+systems aren't in this repo — they live in private repos owned by whoever
+built them. This repo is the portable, company-neutral toolkit: the agent
+library, the skills catalog, the hook runtime, and the bootstrap plumbing.
+
+If you're looking for the full Cascade architecture, the orchestration
+layer that sits above this, start here:
+[samwarren.io/projects/cascade](https://samwarren.io/projects/cascade).
+
+## License
+
+MIT. See `LICENSE`.
+
+## Contributing
+
+If you find a bug in a hook, the bootstrap script, or one of the custom
+skills — open an issue or a PR. If you want to swap in your own agents or
+skills, fork and go. The routing table in `CLAUDE.md` is the contract;
+everything else is composable.
