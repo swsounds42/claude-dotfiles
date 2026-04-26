@@ -1,0 +1,34 @@
+{
+  "comment": "Manually-tracked installed sources that auto-detection can't see (plugin-loaded, ~/.agents/, ~/Downloads/_Archive/repos/, etc.). Format: array of 'owner/name' strings. Edit this file to keep cross-checks accurate. Also embedded in the 'Cascade Discovery Scan' claude.ai routine — refresh both when adding installs.",
+  "installed": [
+    "anthropics/skills",
+    "googleworkspace/cli",
+    "coreyhaines31/marketingskills",
+    "obra/superpowers",
+    "VoltAgent/awesome-claude-code-subagents",
+    "anthropics/claude-code",
+    "modelcontextprotocol/servers",
+    "Jaganpro/sf-skills",
+    "huytieu/COG-second-brain",
+    "trailofbits/skills",
+    "basicmachines-co/basic-memory",
+    "carlrannaberg/claudekit",
+    "thedotmack/claude-mem",
+    "nidhinjs/prompt-master",
+    "blader/humanizer"
+  ],
+  "explored_not_integrated": {
+    "comment": "Repos cloned/downloaded to ~/Downloads/_Archive/repos/ but not yet symlinked into ~/.claude/skills/. Track here so weekly discovery scan doesn't re-recommend them.",
+    "repos": [
+      "Archon-dev",
+      "andrej-karpathy/skills",
+      "ComposioHQ/awesome-claude-skills",
+      "awesome-design-md",
+      "claude-code-best-practice",
+      "jarvis-personal-os",
+      "n8n-skills",
+      "nelson",
+      "ruflo"
+    ]
+  }
+}

@@ -8,10 +8,23 @@
         "SALESFORCE_CLIENT_SECRET": "{{SALESFORCE_CLIENT_SECRET}}",
         "SALESFORCE_INSTANCE_URL": "{{SALESFORCE_INSTANCE_URL}}"
       }
+    },
+    "basic-memory": {
+      "command": "{{HOME}}/.local/bin/basic-memory",
+      "args": ["mcp"]
+    },
+    "mcp-server-chart": {
+      "command": "npx",
+      "args": ["-y", "@antv/mcp-server-chart"]
+    },
+    "gitmcp": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://gitmcp.io/docs"]
     }
   },
   "enabledPlugins": {
-    "slack@claude-plugins-official": true
+    "slack@claude-plugins-official": true,
+    "vercel-plugin@vercel": true
   },
   "hooks": {
     "SessionStart": [
@@ -20,6 +33,20 @@
           {
             "type": "command",
             "command": "node \"{{HOME}}/.claude/hooks/gsd-check-update.js\""
+          },
+          {
+            "type": "command",
+            "command": "node \"{{PERSONAL_OS_PATH}}/scripts/hooks/hook-handler.cjs\" session-start"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{PERSONAL_OS_PATH}}/scripts/hooks/hook-handler.cjs\" route"
           }
         ]
       }
@@ -30,6 +57,51 @@
           {
             "type": "command",
             "command": "node \"{{HOME}}/.claude/hooks/context-watchdog.js\""
+          },
+          {
+            "type": "command",
+            "command": "node \"{{PERSONAL_OS_PATH}}/scripts/hooks/hook-handler.cjs\" post-edit"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{PERSONAL_OS_PATH}}/scripts/hooks/hook-handler.cjs\" post-agent"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{PERSONAL_OS_PATH}}/scripts/hooks/hook-handler.cjs\" post-task"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{PERSONAL_OS_PATH}}/scripts/hooks/hook-handler.cjs\" session-end"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|MultiEdit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{HOME}}/.local/bin/claudekit-hooks run file-guard"
           }
         ]
       }
