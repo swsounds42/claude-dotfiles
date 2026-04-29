@@ -37,6 +37,10 @@
           {
             "type": "command",
             "command": "node \"{{PERSONAL_OS_PATH}}/scripts/hooks/hook-handler.cjs\" session-start"
+          },
+          {
+            "type": "command",
+            "command": "node \"{{HOME}}/.claude/hooks/rtk-bootstrap.js\""
           }
         ]
       }
@@ -102,6 +106,15 @@
           {
             "type": "command",
             "command": "{{HOME}}/.local/bin/claudekit-hooks run file-guard"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
           }
         ]
       }
