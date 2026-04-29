@@ -1,0 +1,114 @@
+# RTK project-local filters — Cascade-tuned
+# Targets noise from tools RTK doesn't have builtins for.
+# Filters only fire when match_command matches, so unused entries are inert.
+# Docs: https://github.com/rtk-ai/rtk#custom-filters
+schema_version = 1
+
+# ============================================================================
+# Cloudflare Wrangler
+# ============================================================================
+[filters.wrangler-generic]
+description = "Strip wrangler boilerplate (deploy banner, upload progress)"
+match_command = "^wrangler\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^⛅️",
+  "^─+$",
+  "^Total Upload:",
+  "^Worker Startup Time:",
+  "^Your worker has access to",
+  "^Uploaded ",
+  "^Preparing ",
+]
+max_lines = 60
+
+# ============================================================================
+# Vercel CLI
+# ============================================================================
+[filters.vercel-generic]
+description = "Strip vercel CLI boilerplate, keep deployment URLs"
+match_command = "^vercel\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^Vercel CLI",
+  "^[\\.\\s]+$",
+  "^Inspect: ",
+  "^Retrieving project",
+  "^Setting up ",
+]
+max_lines = 50
+
+# ============================================================================
+# uv (Python package manager) — modern Python, not in RTK builtins
+# ============================================================================
+[filters.uv-pkg]
+description = "Strip uv sync/install resolution progress"
+match_command = "^uv\\s+(sync|pip|add|remove|lock|export)\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^Resolved \\d+ packages? in",
+  "^Audited \\d+ packages? in",
+  "^Built \\d+ packages? in",
+  "^Downloading\\s",
+  "^Building\\s",
+  "^Preparing\\s",
+]
+max_lines = 40
+
+# ============================================================================
+# Google Workspace CLI (gws) — used by Cascade workflows
+# ============================================================================
+[filters.gws]
+description = "Compact gws CLI output"
+match_command = "^gws\\b"
+strip_ansi = true
+strip_lines_matching = ["^\\s*$"]
+max_lines = 80
+
+# ============================================================================
+# Python script stdout — strip dotenv/boot noise
+# ============================================================================
+[filters.python-noise]
+description = "Strip dotenv loading + blank lines from python scripts"
+match_command = "^python3?\\s+"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^Loaded \\.env",
+  "^Loading environment from",
+  "^DEBUG:.*",
+]
+
+# ============================================================================
+# Node script stdout — strip deprecation warnings
+# ============================================================================
+[filters.node-noise]
+description = "Strip Node deprecation warnings + blank lines"
+match_command = "^node\\s+"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\(node:\\d+\\) \\[DEP\\d+\\]",
+  "^\\(Use `node ",
+  "^\\s*$",
+]
+
+# ============================================================================
+# pnpm install/add — RTK has pnpm-list builtin but not install
+# ============================================================================
+[filters.pnpm-install]
+description = "Compact pnpm install/add/remove output"
+match_command = "^pnpm\\s+(install|i|add|remove|update)\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^Progress: ",
+  "^Packages: ",
+  "^Resolving: ",
+  "^downloading ",
+  "^Already up to date",
+  "^Lockfile is up to date",
+]
+max_lines = 50
