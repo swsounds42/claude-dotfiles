@@ -26,6 +26,10 @@ from pathlib import Path
 CLAUDE_HOME = Path.home() / ".claude"
 REPORTS_DIR = CLAUDE_HOME / "discover-reports"
 EXTRAS_FILE = CLAUDE_HOME / "skills" / "cascade-discover" / "inventory-extras.json"
+LOCK_FILE = CLAUDE_HOME / "skills" / "cascade-discover" / "freshness-lock.json"
+
+# Repos authored by Sam — never flagged as stale (he's the upstream).
+OWN_OWNERS = {"swsounds42", "swsounds"}
 
 DEFAULT_QUERIES = [
     "claude-code skills",
@@ -251,6 +255,247 @@ def discover(queries: list[str], inventory: set[str], min_stars: int, limit: int
 
 
 # ───────────────────────────────────────────────────────────────────
+# Freshness: are the installed repos stale vs upstream?
+# ───────────────────────────────────────────────────────────────────
+#
+# discover() finds NET-NEW tooling and throws away anything installed.
+# Freshness asks the opposite question: of the repos I *already* have,
+# which ones shipped upstream changes since my baseline? Baseline is
+# stored per-repo in freshness-lock.json and only advances when Sam
+# acknowledges an update (--refresh-lock), so drift nags until acted on.
+
+
+def load_own_repos() -> set[str]:
+    """Explicit 'owner/name' repos Sam authors (from inventory-extras.json 'own')."""
+    if not EXTRAS_FILE.exists():
+        return set()
+    try:
+        data = json.loads(EXTRAS_FILE.read_text())
+    except (json.JSONDecodeError, OSError):
+        return set()
+    return {r.lower() for r in data.get("own", [])}
+
+
+def load_lock() -> dict:
+    """Read freshness-lock.json → {'repos': {repo: {...}}, 'muted': [...]}."""
+    if not LOCK_FILE.exists():
+        return {"repos": {}, "muted": []}
+    try:
+        data = json.loads(LOCK_FILE.read_text())
+    except (json.JSONDecodeError, OSError):
+        return {"repos": {}, "muted": []}
+    data.setdefault("repos", {})
+    data.setdefault("muted", [])
+    return data
+
+
+def save_lock(lock: dict) -> None:
+    lock["_updated_at"] = datetime.now(timezone.utc).isoformat()
+    LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
+    LOCK_FILE.write_text(json.dumps(lock, indent=2, sort_keys=True) + "\n")
+
+
+def gh_json(path: str, jq: str | None = None) -> object | None:
+    """Call `gh api <path>` (optionally with --jq). Return parsed JSON, the raw
+    jq string, or None on any error (404, network, timeout, bad auth)."""
+    args = ["gh", "api", path]
+    if jq:
+        args += ["--jq", jq]
+    try:
+        out = subprocess.check_output(
+            args, text=True, timeout=20, stderr=subprocess.DEVNULL
+        ).strip()
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError):
+        return None
+    if not out:
+        return None
+    if jq:
+        return out
+    try:
+        return json.loads(out)
+    except json.JSONDecodeError:
+        return None
+
+
+def probe_repo(repo: str) -> dict | None:
+    """Latest default-branch commit + latest release for a repo.
+    Returns {sha, commit_date, release, release_date} or None if the commit
+    probe fails (repo gone / renamed / private / rate-limited)."""
+    commit = gh_json(
+        f"repos/{repo}/commits?per_page=1",
+        jq='.[0].sha + "\t" + .[0].commit.committer.date',
+    )
+    if not isinstance(commit, str) or "\t" not in commit:
+        return None
+    sha, commit_date = commit.split("\t", 1)
+
+    release = release_date = None
+    rel = gh_json(  # 404s for repos with no releases — that's fine
+        f"repos/{repo}/releases/latest",
+        jq='.tag_name + "\t" + (.published_at // "")',
+    )
+    if isinstance(rel, str) and "\t" in rel:
+        r_tag, r_date = rel.split("\t", 1)
+        release = r_tag or None
+        release_date = r_date or None
+
+    return {
+        "sha": sha,
+        "commit_date": commit_date,
+        "release": release,
+        "release_date": release_date,
+    }
+
+
+def compare_ahead(repo: str, base_sha: str, head_sha: str) -> int | None:
+    """How many commits head is ahead of base. None if the compare fails
+    (e.g. base was force-pushed away). 0 if identical."""
+    if not base_sha or base_sha == head_sha:
+        return 0
+    val = gh_json(f"repos/{repo}/compare/{base_sha}...{head_sha}", jq=".ahead_by")
+    if val is None:
+        return None
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return None
+
+
+def check_freshness(
+    installed: set[str],
+    *,
+    refresh_lock: bool = False,
+    dry_run: bool = False,
+    mute: str | None = None,
+    unmute: str | None = None,
+) -> dict:
+    """Probe every tracked installed repo for upstream drift vs its baseline.
+
+    Returns a result dict with `stale` rows, `errors`, and counts. Side effect:
+    seeds the lockfile for repos seen for the first time and prunes uninstalled
+    ones (unless dry_run). Existing baselines only advance when refresh_lock.
+    """
+    own = OWN_OWNERS, load_own_repos()
+    own_owners, own_repos = own
+    tracked = sorted(
+        r for r in installed
+        if r.split("/", 1)[0] not in own_owners and r not in own_repos
+    )
+
+    lock = load_lock()
+    repos_lock: dict = lock["repos"]
+    muted: set[str] = {m.lower() for m in lock.get("muted", [])}
+    if mute:
+        muted.add(mute.lower())
+    if unmute:
+        muted.discard(unmute.lower())
+    lock["muted"] = sorted(muted)
+
+    # Prune lock entries for repos no longer installed.
+    tracked_set = set(tracked)
+    for gone in [r for r in repos_lock if r not in tracked_set]:
+        repos_lock.pop(gone, None)
+
+    effective = [r for r in tracked if r not in muted]
+
+    stale: list[dict] = []
+    errors: list[str] = []
+    seeded = 0
+
+    for repo in effective:
+        cur = probe_repo(repo)
+        if cur is None:
+            errors.append(repo)
+            continue
+        baseline = repos_lock.get(repo)
+        if baseline is None:
+            repos_lock[repo] = {**cur, "seen_at": datetime.now(timezone.utc).isoformat()}
+            seeded += 1
+            continue
+
+        commits_changed = cur["sha"] != baseline.get("sha")
+        release_changed = bool(cur["release"]) and cur["release"] != baseline.get("release")
+        if commits_changed or release_changed:
+            behind = compare_ahead(repo, baseline.get("sha", ""), cur["sha"]) if commits_changed else 0
+            base_short = (baseline.get("sha") or "")[:10]
+            head_short = cur["sha"][:10]
+            stale.append({
+                "repo": repo,
+                "behind": behind,                       # int or None
+                "latest_sha": head_short,
+                "commit_date": cur["commit_date"],
+                "baseline_sha": base_short,
+                "baseline_date": baseline.get("commit_date"),
+                "release_changed": release_changed,
+                "release": cur["release"],
+                "baseline_release": baseline.get("release"),
+                "compare_url": f"https://github.com/{repo}/compare/{base_short}...{head_short}",
+            })
+
+        if refresh_lock:
+            repos_lock[repo] = {**cur, "seen_at": datetime.now(timezone.utc).isoformat()}
+
+    if not dry_run:
+        save_lock(lock)
+
+    stale.sort(key=lambda r: (r["behind"] is None, -(r["behind"] or 0), r["repo"]))
+    return {
+        "tracked": len(tracked),
+        "checked": len(effective),
+        "seeded": seeded,
+        "muted": sorted(muted),
+        "stale": stale,
+        "errors": errors,
+        "lock_written": not dry_run,
+        "baseline_advanced": refresh_lock and not dry_run,
+    }
+
+
+def render_freshness_markdown(result: dict) -> str:
+    today = datetime.now().strftime("%Y-%m-%d")
+    stale = result["stale"]
+    lines = [
+        f"# Cascade Freshness Report — {today}",
+        "",
+        f"**Tracked:** {result['tracked']} · "
+        f"**Stale:** {len(stale)} · "
+        f"**Newly seeded:** {result['seeded']} · "
+        f"**Muted:** {len(result['muted'])} · "
+        f"**Errors:** {len(result['errors'])}"
+        + ("  ·  _baseline advanced_" if result.get("baseline_advanced") else ""),
+        "",
+    ]
+    if stale:
+        lines += [
+            "| # | Repo | Behind | Latest commit | New release | Upstream pushed | Compare |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for i, r in enumerate(stale, 1):
+            behind = f"{r['behind']} commits" if isinstance(r["behind"], int) and r["behind"] > 0 else (
+                "release only" if r["release_changed"] and r["behind"] == 0 else
+                "?" if r["behind"] is None else "—"
+            )
+            rel = (
+                f"{r['baseline_release'] or '—'} → **{r['release']}**"
+                if r["release_changed"] else "—"
+            )
+            pushed = (r["commit_date"] or "?")[:10]
+            lines.append(
+                f"| {i} | `{r['repo']}` | {behind} | `{r['latest_sha']}` | {rel} | "
+                f"{pushed} | [diff]({r['compare_url']}) |"
+            )
+    else:
+        lines.append(f"✅ All {result['checked']} checked repos are current with their baseline.")
+
+    if result["errors"]:
+        lines += ["", "**Could not probe** (renamed / private / rate-limited): "
+                  + ", ".join(f"`{e}`" for e in result["errors"])]
+    if result["muted"]:
+        lines += ["", "_Muted (not tracked):_ " + ", ".join(f"`{m}`" for m in result["muted"])]
+    return "\n".join(lines) + "\n"
+
+
+# ───────────────────────────────────────────────────────────────────
 # Render
 # ───────────────────────────────────────────────────────────────────
 
@@ -305,6 +550,11 @@ def main() -> int:
     p.add_argument("--limit-per-query", type=int, default=30)
     p.add_argument("--save", nargs="?", const="auto", help="Save report (default: dated file in ~/.claude/discover-reports/)")
     p.add_argument("--json", action="store_true", help="Emit structured JSON instead of markdown (for cascade-brain analyze)")
+    p.add_argument("--check-updates", action="store_true", help="Freshness mode: report installed repos with upstream drift vs baseline")
+    p.add_argument("--refresh-lock", action="store_true", help="Freshness: advance all baselines to current (acknowledge you've updated)")
+    p.add_argument("--dry-run", action="store_true", help="Freshness: probe + report but don't write the lockfile")
+    p.add_argument("--mute", help="Freshness: stop tracking this owner/name repo")
+    p.add_argument("--unmute", help="Freshness: resume tracking this owner/name repo")
     args = p.parse_args()
 
     print("Building inventory...", file=sys.stderr)
@@ -313,6 +563,37 @@ def main() -> int:
 
     if args.inventory_only:
         print(render_inventory(installed, sources))
+        return 0
+
+    if args.check_updates:
+        print("Checking freshness vs upstream...", file=sys.stderr)
+        result = check_freshness(
+            installed,
+            refresh_lock=args.refresh_lock,
+            dry_run=args.dry_run,
+            mute=args.mute,
+            unmute=args.unmute,
+        )
+        print(
+            f"  tracked={result['tracked']} checked={result['checked']} "
+            f"stale={len(result['stale'])} seeded={result['seeded']} "
+            f"errors={len(result['errors'])}",
+            file=sys.stderr,
+        )
+        if args.json:
+            print(json.dumps(result, indent=2))
+            return 0
+        report = render_freshness_markdown(result)
+        if args.save:
+            REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+            if args.save == "auto":
+                path = REPORTS_DIR / f"freshness-{datetime.now().strftime('%Y-%m-%d')}.md"
+            else:
+                path = Path(args.save).expanduser()
+                path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(report)
+            print(f"Saved to {path}", file=sys.stderr)
+        print(report)
         return 0
 
     queries = (

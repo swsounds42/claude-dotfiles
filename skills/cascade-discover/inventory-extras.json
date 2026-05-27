@@ -17,6 +17,10 @@
     "nidhinjs/prompt-master",
     "blader/humanizer"
   ],
+  "own": [
+    "swsounds42/claude-dotfiles"
+  ],
+  "own_comment": "Repos Sam authors — excluded from the freshness check (--check-updates) so it never flags his own commits as 'stale'. Owners swsounds42/* and swsounds/* are auto-excluded too; add cross-owner repos here.",
   "explored_not_integrated": {
     "comment": "Repos cloned/downloaded to ~/Downloads/_Archive/repos/ but not yet symlinked into ~/.claude/skills/. Track here so weekly discovery scan doesn't re-recommend them.",
     "repos": [
@@ -28,7 +32,11 @@
       "jarvis-personal-os",
       "n8n-skills",
       "nelson",
-      "ruflo"
-    ]
+      "ruflo",
+      "disler/claude-code-hooks-multi-agent-observability"
+    ],
+    "skipped_with_reason": {
+      "disler/claude-code-hooks-multi-agent-observability": "Evaluated 2026-05-19. Strong tech (Bun+Vue+SQLite+WebSocket, 12 hook events, AgentSwimLane viz). Skipped: overlaps Cascade's hook capture + drift detection, demands 2 long-lived dev processes per session, per-event Anthropic API spend via --summarize, premise is parallel-agent teams (not Sam's daily workflow). Patterns worth stealing if future need arises: (1) Haiku-summarize-each-event utility, (2) swim-lane viz over existing .cascade/sessions/*.jsonl."
+    }
   }
 }

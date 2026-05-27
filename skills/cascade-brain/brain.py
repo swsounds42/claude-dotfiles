@@ -538,6 +538,24 @@ def _closest_installed(candidate_desc: str, skill_descs: dict[str, str], k: int 
     return [name for name, _ in scored[:k]]
 
 
+def _run_freshness() -> dict | None:
+    """Run discover.py --check-updates --json to find installed repos that
+    drifted upstream. Non-dry so the weekly scan maintains the lockfile
+    (seeds new repos, prunes removed) — baselines only advance on an explicit
+    --refresh-lock. Returns the parsed result, or None if the probe failed."""
+    cmd = ["python3", str(DISCOVER_PY), "--check-updates", "--json"]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+    except subprocess.TimeoutExpired:
+        return None
+    if result.returncode != 0:
+        return None
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+
+
 def cmd_analyze(args: argparse.Namespace) -> int:
     """Build a research brief that Claude (in chat) editorializes."""
     if not DISCOVER_PY.exists():
@@ -590,19 +608,52 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         closest = ", ".join(c.get("closest_installed", [])) or "—"
         print(f"| {i} | {repo_link} | {c['stars']:,} | {pushed} | {c['score']:.0f} | {desc} | {closest} |")
 
+    # 2b. Freshness — installed repos that drifted upstream since baseline
+    print(f"\n## 2. Updates available (installed repos with upstream drift)\n", flush=True)
+    fresh = _run_freshness()
+    if fresh is None:
+        print("_Freshness probe unavailable (gh error or timeout) — skipping this section._\n")
+    else:
+        stale = fresh.get("stale", [])
+        print(
+            f"**Tracked:** {fresh.get('tracked', 0)} installed repos · "
+            f"**Stale:** {len(stale)} · "
+            f"**Newly seeded:** {fresh.get('seeded', 0)} · "
+            f"**Errors:** {len(fresh.get('errors', []))}\n"
+        )
+        if stale:
+            print("| Repo | Behind | New release | Upstream pushed | Compare |")
+            print("|---|---|---|---|---|")
+            for r in stale:
+                behind = (
+                    f"{r['behind']} commits" if isinstance(r.get("behind"), int) and r["behind"] > 0
+                    else "release only" if r.get("release_changed") else "?"
+                )
+                rel = f"{r.get('baseline_release') or '—'} → **{r['release']}**" if r.get("release_changed") else "—"
+                pushed = (r.get("commit_date") or "?")[:10]
+                print(f"| `{r['repo']}` | {behind} | {rel} | {pushed} | [diff]({r['compare_url']}) |")
+            print()
+            print("_These are repos already in the stack running behind their recorded baseline. "
+                  "Bucket each as **STALE** below: worth pulling the update, or pin/mute it. "
+                  "Baseline only advances when Sam runs `discover.py --check-updates --refresh-lock`._\n")
+        else:
+            print("✅ Everything in the stack is current with its baseline.\n")
+
     # 3. Curated lists for Claude to fetch
-    print(f"\n## 2. Curated awesome-lists to consult\n")
+    print(f"\n## 3. Curated awesome-lists to consult\n")
     print("_These are humans-already-filtered. Cascade can't fetch them server-side from this script — "
           "**Claude (in chat) should `WebFetch` each URL** to extract entries that aren't in our inventory yet._\n")
     for lst in CURATED_LISTS:
         print(f"- **[{lst['name']}]({lst['url']})** — {lst['focus']}")
 
     # 4. Editorial instructions (this is what Claude actually does)
-    print(f"\n## 3. Editorial — Claude does this part\n")
+    print(f"\n## 4. Editorial — Claude does this part\n")
     print("For the candidates above AND any net-new entries from the curated lists, produce a")
-    print("prioritized table with three buckets:\n")
+    print("prioritized table with these buckets:\n")
     print("- **HIGH** — net-new gap-filler, install now (give 1-line rationale + estimated install effort)")
     print("- **MED** — complement to existing skill X, worth watching (note what it adds beyond X)")
+    print("- **STALE** — an installed repo from section 2 with an upstream update worth pulling")
+    print("  (or a deliberate pin → say to mute it). One line: what changed + the call.")
     print("- **SKIP** — redundant with X / niche / stale / low-quality (one-line dismissal)\n")
     print("**Cross-check carefully against inventory** ({} installed). The `closest_installed` column".format(inventory.get("size", 0)))
     print("above is a heuristic hint — read the candidate's actual description to confirm redundancy.\n")
@@ -610,8 +661,10 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     print("Notion + Slack + Gmail + Calendar + GitHub. Writes content (samwarren.io). Builds n8n + Python")
     print("automations. Bias toward skills that compound with what's installed, not parallel duplicates.\n")
     print("Render output as a single markdown table with columns:")
-    print("`| Bucket | Repo | ★ | Why (or why not) | Notes |`\n")
-    print("Save the final report to `~/.claude/discover-reports/analysis-$(date +%F).md`.\n")
+    print("`| Bucket | Repo | ★ | Why (or why not) | Notes |`")
+    print("(For STALE rows, put the commits-behind + [diff] link in Notes.)\n")
+    print("Save the final report to `~/.claude/discover-reports/analysis-$(date +%F).md`.")
+    print("Commit summary line: `discover: weekly scan <date> (H HIGH / M MED / S SKIP / T STALE)`.\n")
 
     return 0
 

@@ -12,6 +12,7 @@ package.json
 skills/slidev/
 
 # Ephemeral / machine-specific
+skills/cascade-discover/freshness-lock.json
 cache/
 sessions/
 session-env/
