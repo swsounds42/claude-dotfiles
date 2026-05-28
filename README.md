@@ -12,15 +12,13 @@ This is the tooling layer behind [samwarren.io](https://samwarren.io) and the
 | Path | Contents |
 |------|----------|
 | `CLAUDE.md` | Global auto-routing rules — which skill handles which kind of request |
-| `agents/` | 142 specialist subagent definitions (react-specialist, python-pro, devops-engineer, etc.) |
-| `commands/` | 38 slash commands — n8n, content writing, design, prompts, Slack |
+| `agents/` | 178 specialist subagent definitions (react-specialist, python-pro, devops-engineer, etc.) |
+| `commands/` | 37 slash commands — n8n, content writing, design, prompts, Slack |
 | `hooks/` | `context-statusline.js` + `context-watchdog.js` — context window monitoring |
-| `skills/ui-ux-pro-max/` | UI/UX design intelligence + 58 brand design references |
-| `skills/brand/` | Brand voice, visual identity, messaging frameworks |
-| `skills/design-system/` | Token architecture, component specs, spacing/typography scales |
-| `skills/frontend-slides/` | HTML presentation generation |
-| `skills/humanizer/` | Removes AI-writing tells from text |
-| `skills/last30days/` | Recent social sentiment research across Reddit, X, YouTube, HN |
+| `skills/` (design) | `ui-ux-pro-max`, `design-system`, `brand`, `frontend-slides`, `slides`, `banner-design`, `ui-styling`, `design` — UI/UX intelligence, token architecture, brand voice, presentation generation |
+| `skills/` (writing) | `humanizer` (removes AI-writing tells), `last30days` (social sentiment research across Reddit, X, YouTube, HN) |
+| `skills/` (cascade meta) | `cascade-brain` (brain introspection + stats), `cascade-discover` (new-tool discovery) |
+| `skills/` (dev workflow) | `grill-with-docs`, `improve-codebase-architecture`, `caveman` |
 | `settings.json.template` | Claude settings with secrets and paths replaced by `{{PLACEHOLDER}}` variables |
 
 **Installed by `bootstrap.sh` (not stored in this repo):**
@@ -105,9 +103,9 @@ marketplace skills got added to `skills.sh`.
 
 | Layer | Count |
 |-------|-------|
-| Skills (knowledge files) | 148 (5 custom + 143 marketplace) |
-| Commands (slash commands) | 38 |
-| Specialist agents | 142 |
+| Skills (knowledge files) | 158 (15 custom + 143 marketplace) |
+| Commands (slash commands) | 37 |
+| Specialist agents | 178 |
 | Brand design references | 58 (via `npx getdesign@latest add <name>`) |
 
 ## What's not included
