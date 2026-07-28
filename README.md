@@ -12,9 +12,9 @@ This is the tooling layer behind [samwarren.io](https://samwarren.io) and the
 | Path | Contents |
 |------|----------|
 | `CLAUDE.md` | Global auto-routing rules — which skill handles which kind of request |
-| `agents/` | 178 specialist subagent definitions (react-specialist, python-pro, devops-engineer, etc.) |
-| `commands/` | 37 slash commands — n8n, content writing, design, prompts, Slack |
-| `hooks/` | `context-statusline.js` + `context-watchdog.js` — context window monitoring |
+| `agents/` | 167 specialist subagent definitions (react-specialist, python-pro, devops-engineer, etc.) |
+| `commands/` | 39 slash commands — n8n, content writing, design, prompts, Slack |
+| `hooks/` | `context-statusline.js` + `context-watchdog.js` (context window monitoring), `model-router.cjs` (per-prompt Claude tier recommendation), `rtk-bootstrap.js` |
 | `skills/` (design) | `ui-ux-pro-max`, `design-system`, `brand`, `frontend-slides`, `slides`, `banner-design`, `ui-styling`, `design` — UI/UX intelligence, token architecture, brand voice, presentation generation |
 | `skills/` (writing) | `humanizer` (removes AI-writing tells), `last30days` (social sentiment research across Reddit, X, YouTube, HN) |
 | `skills/` (cascade meta) | `cascade-brain` (brain introspection + stats), `cascade-discover` (new-tool discovery) |
@@ -103,9 +103,9 @@ marketplace skills got added to `skills.sh`.
 
 | Layer | Count |
 |-------|-------|
-| Skills (knowledge files) | 158 (15 custom + 143 marketplace) |
-| Commands (slash commands) | 37 |
-| Specialist agents | 178 |
+| Skills (knowledge files) | 159 (16 custom + 143 marketplace) |
+| Commands (slash commands) | 39 |
+| Specialist agents | 167 |
 | Brand design references | 58 (via `npx getdesign@latest add <name>`) |
 
 ## What's not included

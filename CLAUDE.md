@@ -86,7 +86,7 @@ Rationale: Opus on trivia wastes ~5× credits silently. Haiku failing on hard wo
 
 Thresholds and pattern lists live in `~/Desktop/personal-os-main/scripts/hooks/model-router.cjs` — tune `EMIT_THRESHOLD_OPUS`, `EMIT_THRESHOLD_HAIKU`, `SHORT_PROMPT_CHARS`, `SHORT_PROMPT_WORDS`, or the `MODEL_PATTERNS` array directly.
 
-**Recommended baseline:** run sessions on **Sonnet 4.6** as the default (`/model sonnet`). The router catches the cases that genuinely need Opus and downgrades the trivial work to Haiku.
+**Recommended baseline:** **Sonnet 4.6 is the configured default** — set via the `"model"` key in `settings.json`, so new sessions start on Sonnet. Opt *up* to Opus per-session with `/model opus` (or `!opus`) for marathon ship-work and hard reasoning; the router still escalates the cases that genuinely need Opus and downgrades trivial work to Haiku. The content-aware guard (`hasRealWorkSignal()`) rescues short real-work prompts — troubleshooting, scoped questions, review/feedback — so they fall through to Sonnet instead of getting downgraded.
 
 ## Skill Auto-Routing
 
