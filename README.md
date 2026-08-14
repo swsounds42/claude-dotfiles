@@ -17,6 +17,7 @@ This is the tooling layer behind [samwarren.io](https://samwarren.io) and the
 | `hooks/` | `context-statusline.js` + `context-watchdog.js` (context window monitoring), `model-router.cjs` (per-prompt Claude tier recommendation), `rtk-bootstrap.js` |
 | `skills/` (design) | `ui-ux-pro-max`, `design-system`, `brand`, `frontend-slides`, `slides`, `banner-design`, `ui-styling`, `design` — UI/UX intelligence, token architecture, brand voice, presentation generation |
 | `skills/` (writing) | `humanizer` (removes AI-writing tells), `last30days` (social sentiment research across Reddit, X, YouTube, HN) |
+| `skills/` (job search) | `job-search-kit` — cover-letter tailoring, interview prep, and round debriefs driven off a personal proof bank + style card. Truth-preserving (never claims a tool you haven't used) and voice-preserving (won't sand off your writing signatures) |
 | `skills/` (cascade meta) | `cascade-brain` (brain introspection + stats), `cascade-discover` (new-tool discovery) |
 | `skills/` (dev workflow) | `grill-with-docs`, `improve-codebase-architecture`, `caveman` |
 | `settings.json.template` | Claude settings with secrets and paths replaced by `{{PLACEHOLDER}}` variables |
