@@ -657,7 +657,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     print("- **SKIP** — redundant with X / niche / stale / low-quality (one-line dismissal)\n")
     print("**Cross-check carefully against inventory** ({} installed). The `closest_installed` column".format(inventory.get("size", 0)))
     print("above is a heuristic hint — read the candidate's actual description to confirm redundancy.\n")
-    print("**Cascade fit lens:** RevOps / sales analyst at Homebot.ai, daily tools = SF + HubSpot + Gong +")
+    print("**Cascade fit lens:** RevOps / sales analyst, daily tools = SF + marketing automation + call recording +")
     print("Notion + Slack + Gmail + Calendar + GitHub. Writes content (samwarren.io). Builds n8n + Python")
     print("automations. Bias toward skills that compound with what's installed, not parallel duplicates.\n")
     print("Render output as a single markdown table with columns:")
@@ -680,7 +680,7 @@ def _find_skill_md(skill_name: str) -> Path | None:
     candidate_dir = SKILLS_DIR / skill_name / "SKILL.md"
     if candidate_dir.exists():
         return candidate_dir
-    # Try as bare file in commands/ (homebot-forecast-checker.md style)
+    # Try as bare file in commands/ (commands/<name>.md style)
     candidate_file = HOME / ".claude" / "commands" / f"{skill_name}.md"
     if candidate_file.exists():
         return candidate_file

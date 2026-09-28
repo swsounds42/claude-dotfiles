@@ -54,7 +54,7 @@ Replace `HOURS` with the actual number from the time window.
 2. **Group by file** — which files got the most attention? Indicates focus areas.
 3. **Group by tool** — were you writing (Edit/Write), researching (Read/Grep), shipping (Bash/git)?
 4. **Group by subagent type** — `Agent(X)` entries show what specialist work was dispatched.
-5. **Extract themes** — look at file paths, directory prefixes, keywords in input summaries. Identify 2-5 coherent themes (e.g. "Jarvis observation layer", "Ernie skill work", "best-practice audit").
+5. **Extract themes** — look at file paths, directory prefixes, keywords in input summaries. Identify 2-5 coherent themes (e.g. "Jarvis observation layer", "voice skill work", "best-practice audit").
 6. **Pick notable moments** — anything that stands out: new files created, long Bash commands, multi-agent dispatches, errors.
 
 ## Output format
@@ -68,7 +68,7 @@ Return a JSON block like this (no prose before or after, just the JSON):
   "observation_count": 42,
   "top_themes": [
     { "theme": "Jarvis observation layer", "observation_count": 18, "files": ["observations.cjs", "hook-handler.cjs", "intelligence.cjs"] },
-    { "theme": "Ernie skill creation", "observation_count": 12, "files": ["skills/ernie/SKILL.md", "references/"] }
+    { "theme": "Voice skill creation", "observation_count": 12, "files": ["skills/voice/SKILL.md", "references/"] }
   ],
   "files_touched": [
     { "path": "scripts/hooks/observations.cjs", "touches": 8, "tools": ["Edit", "Write"] }

@@ -4,7 +4,7 @@
 
 1. Check the Cascade hook output (top of context — `[CASCADE SKILLS]`, `[CASCADE ROUTING]`, and `[CASCADE MODEL]` blocks). If a skill or agent appears with score ≥ 0.20, **INVOKE IT before doing inline work**. If `[CASCADE MODEL]` recommends Opus or Haiku, **delegate the work via the Task tool with that `model:` parameter** rather than running on the session's default model.
 2. Scan the routing table below. If the request matches a row, **MUST invoke the listed skill** — do not paraphrase or do it yourself.
-3. Spawn a specialist subagent for any task spanning > 1 file or requiring domain depth (SF, HubSpot, Python, frontend, security, etc.).
+3. Spawn a specialist subagent for any task spanning > 1 file or requiring domain depth (SF, Python, frontend, security, etc.).
 
 **Bias toward skill/agent invocation, not inline action.** A 299-skill stack only pays off if it fires. Every prompt is a routing decision first, an action second.
 
@@ -21,11 +21,6 @@ Avoid re-reading the same file. If you need to look at `<file>` again, point Cla
 | Code review / PR review / "looks good?" | `code-reviewer` agent + `tob-differential-review` skill |
 | SOQL / Salesforce query | `sf-soql` skill |
 | SF report / dashboard / list view changes | `sf-reports` skill |
-| SF opportunity attribution | `sf-attribution` skill |
-| Salesforce contact deduplication / merge contacts / clean up dupes / "same contact twice" | `sf-contact-dedup` skill |
-| HubSpot workflow / property mismatch | `hubspot-ops` skill |
-| Gong forecast prep / weekly check | `homebot-forecast-checker` or `gong-forecast-ops` skill |
-| Gong call data / transcript / summary / submission status / library folder pull | `mcp__gong__*` tools (gongio-mcp) — never paste screenshots when MCP can fetch |
 | Find a past Claude Code session by topic ("which session did I work on X") | `session-finder` or `session-search` skill |
 | "Should I automate this?" / structured automation triage | `automation-advisor` skill |
 | Tufte-style data report / publication-quality HTML dashboard with sparklines + Chart.js | `tufte-report` skill |
@@ -68,7 +63,7 @@ Rationale: Opus on trivia wastes ~5× credits silently. Haiku failing on hard wo
 | (no `[CASCADE MODEL]` block) | Sonnet 4.6 is sufficient. Run inline. |
 
 **Tier intent (aggressive mode):**
-- **Opus 4.7** — GSD planning/debug/research skills, "design a [system\|architecture\|pipeline\|layer\|...]", security audits, strategic memos, board updates, mbb-frame, Ernie persona, production-grade hard debugging (race conditions, intermittent failures, root-cause analysis)
+- **Opus 4.7** — GSD planning/debug/research skills, "design a [system\|architecture\|pipeline\|layer\|...]", security audits, strategic memos, board updates, mbb-frame, production-grade hard debugging (race conditions, intermittent failures, root-cause analysis)
 - **Sonnet 4.6** *(silent default)* — standard build tasks (implement/build/create/write + code noun), code review, bug fixes, test writing, doc updates, refactors, multi-file work, drafting messages
 - **Haiku 4.5** — confirmations (yes/lgtm/ship-it), typo/lint fixes, commit messages, Cascade/GSD quick commands, `gws-*` / `recipe-*` / `sf-(soql\|metadata\|deploy\|...)` mechanical ops, single-field updates, deletions, run/execute, lookups, **and any short prompt without a stronger signal**
 
@@ -140,16 +135,9 @@ When a user request matches an installed skill, **MUST invoke it automatically v
 | Managing SF dashboards — listing, creating, updating, refreshing dashboards | `sf-reports` |
 | Quarterly report updates, flipping date filters across multiple SF reports | `sf-reports` |
 | Managing SF list views — creating, editing, or running Contact/Lead/Opp list views | `sf-reports` |
-| SF contact deduplication — finding, merging, or cleaning up duplicate contacts | `sf-contact-dedup` |
 | UI/UX design decisions, accessibility checks, interaction patterns, visual consistency | `ui-ux-pro-max` |
 | Brand voice, visual identity, messaging frameworks, brand compliance | `brand` |
 | Design tokens, CSS variable systems, component specs, spacing/typography scales | `design-system` |
-| HubSpot workflow management, branch filter updates, workflow inspection | `hubspot-ops` |
-| HubSpot contact hygiene, HS/SF property mismatches, bulk contact updates | `hubspot-ops` |
-| Cross-system HubSpot-Salesforce sync checks, property alignment | `hubspot-ops` |
-| "hey Ernie", "ask Ernie", "what would Ernie say", "Ernie mode", CEO feedback in Ernie's voice | `ernie` |
-| Pressure-testing a product or strategy decision as if Ernie Graham were reviewing it | `ernie` |
-| Writing an email, Slack post, or doc in Ernie's voice | `ernie` |
 | Converting a PDF, DOCX, EPUB, PPTX, or web page into Markdown Claude can read | `convert-document` |
 | "Read this report", "extract this deck", "scrape this page", user drops a binary file or URL | `convert-document` |
 | Applying MBB / McKinsey structure (SCQA, Pyramid, MECE, Data Three Essentials) to any doc | `mbb-frame` |

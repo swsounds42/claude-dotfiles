@@ -22,8 +22,6 @@ const { execSync } = require('child_process');
 const SAM_OWNERS = [
   'swsounds42',
   'swsounds',
-  'homebot-labs',
-  'homebot.ai',
   'sam-warren',
   'samwarren',
 ];
