@@ -9,18 +9,22 @@ This is the tooling layer behind [samwarren.io](https://samwarren.io) and the
 
 ## What you get
 
-| Path | Contents |
-|------|----------|
-| `CLAUDE.md` | Global auto-routing rules — which skill handles which kind of request |
-| `agents/` | 167 specialist subagent definitions (react-specialist, python-pro, devops-engineer, etc.) |
-| `commands/` | 39 slash commands — n8n, content writing, design, prompts, Slack |
-| `hooks/` | `context-statusline.js` + `context-watchdog.js` (context window monitoring), `model-router.cjs` (per-prompt Claude tier recommendation), `rtk-bootstrap.js` |
-| `skills/` (design) | `ui-ux-pro-max`, `design-system`, `brand`, `frontend-slides`, `slides`, `banner-design`, `ui-styling`, `design` — UI/UX intelligence, token architecture, brand voice, presentation generation |
-| `skills/` (writing) | `humanizer` (removes AI-writing tells), `last30days` (social sentiment research across Reddit, X, YouTube, HN) |
-| `skills/` (job search) | `job-search-kit` — cover-letter tailoring, interview prep, and round debriefs driven off a personal proof bank + style card. Truth-preserving (never claims a tool you haven't used) and voice-preserving (won't sand off your writing signatures) |
-| `skills/` (cascade meta) | `cascade-brain` (brain introspection + stats), `cascade-discover` (new-tool discovery) |
-| `skills/` (dev workflow) | `grill-with-docs`, `improve-codebase-architecture`, `caveman` |
-| `settings.json.template` | Claude settings with secrets and paths replaced by `{{PLACEHOLDER}}` variables |
+Most of this is other people's work, vendored so a restore works offline and
+stays pinned. The Source column says where each piece came from, and
+[`NOTICE.md`](NOTICE.md) has the licenses.
+
+| Path | Contents | Source |
+|------|----------|--------|
+| `CLAUDE.md` | Global auto-routing rules — which skill handles which kind of request | mine |
+| `agents/` | 167 specialist subagent definitions (react-specialist, python-pro, devops-engineer, etc.) | 130 from [VoltAgent](https://github.com/VoltAgent/awesome-claude-code-subagents), 33 from [GSD](https://github.com/gsd-build/get-shit-done), 2 from [ECC](https://github.com/affaan-m/ECC), `recap-analyst` is mine |
+| `commands/` | 37 slash commands plus `subagent-catalog/` — n8n, content writing, design, prompts, Slack | [Anthropic](https://github.com/anthropics/skills) and [Composio](https://github.com/ComposioHQ/awesome-claude-skills) skills, [n8n-skills](https://github.com/czlonkowski/n8n-skills), [prompt-master](https://github.com/nidhinjs/prompt-master) + [prompt-mini](https://github.com/nidhinjs/prompt-mini), VoltAgent's subagent-catalog; `/recap` is mine |
+| `hooks/` | `context-statusline.js` + `context-watchdog.js` (context window monitoring), `model-router.cjs` (per-prompt Claude tier recommendation), `rtk-bootstrap.js` | mine; the context hooks are adapted from [Nelson](https://github.com/Aspegio/nelson) |
+| `skills/` (design) | `ui-ux-pro-max`, `design-system`, `brand`, `frontend-slides`, `slides`, `banner-design`, `ui-styling`, `design` — UI/UX intelligence, token architecture, brand voice, presentation generation | [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill), plus [frontend-slides](https://github.com/zarazhangrui/frontend-slides) |
+| `skills/` (writing) | `humanizer` (removes AI-writing tells), `last30days` (social sentiment research across Reddit, X, YouTube, HN) | [humanizer](https://github.com/blader/humanizer), [last30days](https://github.com/mvanhorn/last30days-skill) |
+| `skills/` (job search) | `job-search-kit` — cover-letter tailoring, interview prep, and round debriefs driven off a personal proof bank + style card. Truth-preserving (never claims a tool you haven't used) and voice-preserving (won't sand off your writing signatures) | mine |
+| `skills/` (cascade meta) | `cascade-brain` (brain introspection + stats), `cascade-discover` (new-tool discovery), `efficiency` (token-efficiency dashboard) | mine |
+| `skills/` (dev workflow) | `grill-with-docs`, `improve-codebase-architecture`, `caveman` | [Matt Pocock's skills](https://github.com/mattpocock/skills); caveman started as [Julius Brussee's](https://github.com/JuliusBrussee/caveman) |
+| `settings.json.template` | Claude settings with secrets and paths replaced by `{{PLACEHOLDER}}` variables | mine |
 
 **Installed by `bootstrap.sh` (not stored in this repo):**
 
@@ -104,8 +108,8 @@ marketplace skills got added to `skills.sh`.
 
 | Layer | Count |
 |-------|-------|
-| Skills (knowledge files) | 159 (16 custom + 143 marketplace) |
-| Commands (slash commands) | 39 |
+| Skills (knowledge files) | 160 (17 in this repo, 4 of them mine, + 143 marketplace) |
+| Commands (slash commands) | 37 |
 | Specialist agents | 167 |
 | Brand design references | 58 (via `npx getdesign@latest add <name>`) |
 
@@ -122,7 +126,16 @@ layer that sits above this, start here:
 
 ## License
 
-MIT. See `LICENSE`.
+My own files are MIT. See `LICENSE`.
+
+Everything vendored keeps its original license. That's MIT or Apache-2.0 for
+almost all of it, and the SIL Open Font License for the bundled fonts.
+`commands/twitter-algorithm-optimizer.md` is the one exception: it's
+AGPL-3.0. [`NOTICE.md`](NOTICE.md) lists every source, its license, and where
+its license file sits in this repo.
+
+Earlier commits include the same third-party files without their license
+files. Those files were always under their original licenses, not MIT.
 
 ## Contributing
 
@@ -130,3 +143,6 @@ If you find a bug in a hook, the bootstrap script, or one of the custom
 skills — open an issue or a PR. If you want to swap in your own agents or
 skills, fork and go. The routing table in `CLAUDE.md` is the contract;
 everything else is composable.
+
+Anything vendored from another project needs its upstream license file next
+to it and an entry in `NOTICE.md`.
