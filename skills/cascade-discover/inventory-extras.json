@@ -15,7 +15,11 @@
     "carlrannaberg/claudekit",
     "thedotmack/claude-mem",
     "nidhinjs/prompt-master",
-    "blader/humanizer"
+    "blader/humanizer",
+    "AgriciDaniel/claude-seo",
+    "addyosmani/web-quality-skills",
+    "vercel-labs/agent-skills",
+    "resend/resend-skills"
   ],
   "own": [
     "swsounds42/claude-dotfiles"

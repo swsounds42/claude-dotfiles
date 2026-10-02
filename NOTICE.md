@@ -37,6 +37,11 @@ advice.
 | `skills/humanizer/` | [blader/humanizer](https://github.com/blader/humanizer) | MIT | `skills/humanizer/LICENSE` |
 | `skills/grill-with-docs/`, `skills/improve-codebase-architecture/` | [mattpocock/skills](https://github.com/mattpocock/skills) | MIT | `skills/<name>/LICENSE` |
 | `skills/caveman/` | [mattpocock/skills](https://github.com/mattpocock/skills), reworked from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | MIT | `skills/caveman/LICENSE` |
+| `skills/seo-local/`, `skills/seo-maps/` | [AgriciDaniel/claude-seo](https://github.com/AgriciDaniel/claude-seo) @ `ff87fce` | MIT | `skills/<name>/LICENSE` |
+| `skills/web-quality-audit/`, `core-web-vitals/`, `wq-accessibility/`, `wq-seo/`, `wq-performance/`, `wq-best-practices/` | [addyosmani/web-quality-skills](https://github.com/addyosmani/web-quality-skills) @ `afa8da9` | MIT | `skills/<name>/LICENSE` |
+| `skills/web-design-guidelines/`, `composition-patterns/`, `react-view-transitions/`, `vercel-optimize/` | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) @ `063bee9` | MIT (stated in README, no LICENSE file upstream) | `skills/<name>/LICENSE` |
+| `skills/email-best-practices/`, `skills/react-email/` | [resend/resend-skills](https://github.com/resend/resend-skills) @ `edbfece` | MIT | `skills/<name>/LICENSE` |
+| `skills/cdt-*/` (7 skills) | [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) @ tag `chrome-devtools-mcp-v1.10.1` (`e52c6b5`) | Apache-2.0 | `skills/<name>/LICENSE` |
 | `hooks/context-statusline.js`, `hooks/context-watchdog.js` | Adapted from [Nelson](https://github.com/Aspegio/nelson) | MIT | [below](#nelson) |
 | `RTK.md` | [rtk-ai/rtk](https://github.com/rtk-ai/rtk) | Apache-2.0 | `licenses/Apache-2.0.txt` |
 
@@ -181,6 +186,62 @@ MIT, Copyright (c) 2026 Matt Pocock. `grill-with-docs`,
 2026 Julius Brussee). `skills/caveman/LICENSE` carries both notices. Julius's
 repo now puts its engine under the Business Source License, but the skill
 has always been under MIT, and none of the engine is here.
+
+### claude-seo
+
+MIT, Copyright (c) 2026 AgriciDaniel. Only `seo-local` and `seo-maps`, from
+commit `ff87fce`. No hooks, installers, agents or other skills. **Modified:**
+the reference files both skills load from upstream's shared
+`skills/seo/references/` folder are copied into each skill's own
+`references/` folder (unchanged), the `../seo/references/` paths in each
+`SKILL.md` now point there, and each `SKILL.md` ends with a short
+"Vendored copy" note about the upstream `/seo ...` commands that aren't
+installed. Upstream's per-folder `LICENSE.txt` stub is kept, and `LICENSE` is
+upstream's full root licence.
+
+### web-quality-skills
+
+MIT, Copyright (c) 2026 Addy Osmani. All six skills from commit `afa8da9`.
+**Modified:** `accessibility`, `seo`, `performance` and `best-practices` are
+renamed `wq-accessibility`, `wq-seo`, `wq-performance` and
+`wq-best-practices` (folder and frontmatter `name:`) so they don't collide
+with other SEO and accessibility skills. The `../<name>/` links in
+`web-quality-audit` and `core-web-vitals` point at the new folder names.
+`web-quality-audit` and `core-web-vitals` keep their names. Nothing else
+changed.
+
+### Vercel agent-skills
+
+MIT, as stated in the README of
+[vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)
+(commit `063bee9`). The repo has no LICENSE file, so each folder's `LICENSE`
+holds the MIT text with "Copyright (c) Vercel, Inc." and a note saying where
+the licence statement comes from. `web-design-guidelines`,
+`composition-patterns`, `react-view-transitions` and `vercel-optimize`,
+unmodified. Upstream's frontmatter names `vercel-composition-patterns` and
+`vercel-react-view-transitions` are left as they are. `web-design-guidelines`
+fetches its rules at run time from
+`https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md`.
+
+### Resend skills
+
+MIT, Copyright (c) 2026 Resend. `email-best-practices` and `react-email` from
+commit `edbfece`, unmodified. The skills that send email or need a Resend API
+key (`resend`, `resend-cli`, `agent-email-inbox`) aren't here.
+
+### Chrome DevTools MCP skills
+
+Apache-2.0, Copyright Google LLC. The seven skills shipped in
+[ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp)
+at tag `chrome-devtools-mcp-v1.10.1` (`e52c6b5`), matching the pinned
+server version. **Modified:** each is renamed with a `cdt-` prefix
+(`cdt-a11y-debugging`, `cdt-chrome-devtools`, `cdt-chrome-devtools-cli`,
+`cdt-cookie-debugging`, `cdt-debug-optimize-lcp`, `cdt-memory-leak-debugging`,
+`cdt-troubleshooting`), folder and frontmatter `name:`, and each `SKILL.md`
+carries an HTML comment recording that change. Nothing else changed. The
+server itself isn't vendored: `settings.json.template` runs
+`npx -y chrome-devtools-mcp@1.10.1 --no-usage-statistics --no-performance-crux`
+with `CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS=1`.
 
 ## Hooks and root files
 

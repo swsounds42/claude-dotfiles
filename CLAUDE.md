@@ -145,6 +145,14 @@ When a user request matches an installed skill, **MUST invoke it automatically v
 | Token waste audit, "what skills/MCPs am I not using", Claude Code health grade, optimize CLAUDE.md | run `codeburn optimize --provider claude -p 30days` (CLI, read-only) |
 | Per-model one-shot rate, validate model-router thresholds, productive-vs-reverted spend | run `codeburn compare -p 30days` or `codeburn yield -p 30days` |
 | AI-slop UI detection, audit HTML for design anti-patterns (purple gradients, Inter, cards-in-cards, gray-on-color), pre-ship design check | run `npx impeccable detect <path>` (CLI, no LLM, suitable for CI) |
+| Local SEO, Google Business Profile, Maps rankings, reviews, NAP consistency, citations | `seo-local`; geo-grid rank tracking / competitor radius: `seo-maps` |
+| Web quality / Lighthouse audit, "is my site fast", Core Web Vitals (LCP, INP, CLS), slow page | `web-quality-audit`, `core-web-vitals`, `wq-performance`; slow hero/LCP in real Chrome: `cdt-debug-optimize-lcp` (Chrome DevTools MCP) |
+| Web accessibility audit (WCAG 2.2) in code or a live browser | `wq-accessibility`, `cdt-a11y-debugging` |
+| UI review against web interface guidelines (file:line findings) | `web-design-guidelines` |
+| React page/route transitions, View Transition API | `react-view-transitions` |
+| React component API design, compound components, boolean-prop sprawl | `composition-patterns` |
+| Email deliverability, spam, SPF/DKIM/DMARC, bounces, CAN-SPAM/GDPR | `email-best-practices`; HTML email templates: `react-email` |
+| Vercel cost / performance from real metrics, "why is my Vercel bill high" | `vercel-optimize` |
 | Stress-test a plan against project's domain language, build/maintain CONTEXT.md, capture ADRs as you decide | `grill-with-docs` skill — manual invocation via `/grill-with-docs` (skill has `disable-model-invocation: true`) |
 | Find refactor candidates, surface deepening opportunities, Ousterhout deep-module review, identify shallow modules earning their keep | `improve-codebase-architecture` skill |
 | "Be terse", "cut output tokens", "caveman mode", "talk like caveman", long debug sessions where output bloat is expensive | `caveman` skill (toggles persistent compressed-output mode; "stop caveman" to disable) |
