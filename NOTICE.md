@@ -127,9 +127,10 @@ are here.
 ### prompt-master and prompt-mini
 
 MIT, Copyright (c) 2026 Nidhin Joseph Nelson. Both are edited versions.
-`commands/prompt-master.md` and its two reference files in
-`commands/skill-resources/prompt-master/` are trimmed and reworked from
-upstream. `commands/prompt-mini.md` has an edited description and rules. Its
+`commands/prompt-master.md` is trimmed and reworked from upstream. Its two
+reference files in `commands/skill-resources/prompt-master/` are unmodified
+copies of upstream `references/` at `2bd9251` (August 2026).
+`commands/prompt-mini.md` has an edited description and rules. Its
 four reference files in `commands/skill-resources/prompt-mini/` are
 unmodified.
 

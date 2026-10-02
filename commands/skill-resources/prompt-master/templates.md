@@ -10,7 +10,7 @@ Full template library for Prompt Master. Read the relevant template when the use
 | [B — CO-STAR](#template-b--co-star) | Professional documents, business writing |
 | [C — RISEN](#template-c--risen) | Complex multi-step projects |
 | [D — CRISPE](#template-d--crispe) | Creative work, brand voice |
-| [E — Chain of Thought](#template-e--chain-of-thought) | Logic, math, analysis, debugging |
+| [E — Auditable Reasoning](#template-e--auditable-reasoning) | Logic, math, analysis, debugging |
 | [F — Few-Shot](#template-f--few-shot) | Consistent structured output, pattern replication |
 | [G — File-Scope](#template-g--file-scope) | Cursor, Windsurf, Copilot — code editing AI |
 | [H — ReAct + Stop Conditions](#template-h--react--stop-conditions) | Claude Code, Devin — autonomous agents |
@@ -18,6 +18,7 @@ Full template library for Prompt Master. Read the relevant template when the use
 | [J — Reference Image Editing](#template-j--reference-image-editing) | Editing an existing image with a reference |
 | [K — ComfyUI](#template-k--comfyui) | ComfyUI node-based image workflows |
 | [L — Prompt Decompiler](#template-l--prompt-decompiler) | Breaking down, adapting, or splitting existing prompts |
+| [M — Current Claude Task Brief](#template-m--current-claude-task-brief) | Complex, multi-step, or agentic task on current Claude models |
 
 ---
 
@@ -120,36 +121,32 @@ Experiment: Give 3 variants ranging from minimal to bold.
 
 ---
 
-## Template E — Chain of Thought
+## Template E — Auditable Reasoning
 
-*Use for logic-heavy tasks, math, debugging, and multi-factor analysis where the AI needs to reason carefully before committing to an answer.*
-
-**Important:** Only use CoT for standard reasoning models (Claude, GPT-4o, Gemini). Do NOT add CoT instructions to o1, o3, or Claude extended thinking — they reason internally and CoT instructions degrade their output.
+*Use for logic-heavy tasks, math, debugging, and multi-factor analysis where the result must be checkable without requesting private reasoning.*
 
 ```
 [Task statement]
 
-Before answering, think through this carefully:
-<thinking>
-1. What is the actual problem being asked?
-2. What constraints must the solution respect?
-3. What are the possible approaches?
-4. Which approach is best and why?
-</thinking>
+Return:
+1. Conclusion
+2. Assumptions
+3. Evidence or intermediate results needed to audit the conclusion
+4. Verification checks performed
+5. Remaining uncertainty, if any
 
-Give your final answer in <answer> tags only.
+Do not reveal hidden chain-of-thought or private reasoning. Keep the rationale concise and decision-relevant.
 ```
 
 **When to use:**
 - Debugging where the cause is not obvious
-- Comparing two technical approaches
-- Any math or calculation
-- Analysis where a wrong first impression is likely
+- Comparing technical approaches
+- Math or calculation requiring verification
+- Analysis where evidence and assumptions must be inspectable
 
 **When NOT to use:**
-- o1 / o3 / reasoning models (they think internally — adding CoT hurts)
-- Simple tasks where the answer is clear (unnecessary overhead)
-- Creative tasks (CoT can kill natural voice)
+- Simple tasks where the answer is clear
+- Creative tasks where an audit trail adds noise
 
 ---
 
@@ -393,3 +390,53 @@ Prompt 2 — [what it handles]:
 
 Run these in order. Each output feeds the next.
 ```
+---
+
+## Template M — Current Claude Task Brief
+
+*Use for complex, multi-step, or agentic tasks on current Claude models—Claude.ai, API, or Claude Code. It front-loads the outcome, context, scope, and action boundaries while avoiding obsolete manual-thinking scaffolding.*
+
+```
+## Objective
+[What needs to be built, fixed, or produced — one clear sentence. Add WHY if it affects approach.]
+
+## Context
+[What exists now — relevant files, current behavior, stack already in place, what was tried and failed]
+
+## Target State
+[What done looks like — specific files changed, behavior produced, tests passing. Binary where possible.]
+
+## Scope
+- Work only in: [specific files and directories]
+- Do NOT touch: [forbidden files — .env, package-lock.json, configs, anything outside scope]
+
+## Constraints
+- [Stack version, naming conventions, no new dependencies without asking]
+- Only make changes directly requested. Do not add features, abstractions, or files beyond what was asked.
+
+## Acceptance Criteria
+- [ ] [Binary check 1]
+- [ ] [Binary check 2]
+- [ ] [Binary check 3]
+
+## Action Boundaries
+- Proceed with reversible, in-scope inspection, edits, and validation.
+- Stop and ask before destructive or irreversible actions, external writes, purchases, material scope expansion, or decisions that require user-only input.
+
+## Progress Evidence
+For long-running work, report progress only when it changes or when a checkpoint is reached. Ground every completion claim in a tool result, changed artifact, or verification output.
+```
+
+**Effort** — configure in the API or harness rather than requesting private reasoning in the prompt. Start with the model default, lower it for routine scoped work, and raise it only when task difficulty warrants the cost.
+
+**Claude Code only — add Session Strategy block when relevant:**
+```
+## Session Strategy
+[Pick one:]
+- New session — unrelated to prior context, start fresh
+- Continue — prior context still needed
+- Subagent — delegate only [independent, sizeable workstream], with a bounded deliverable
+- Compact first — compact around [decisions, constraints, and current state], then begin
+```
+
+**When to use:** Current Claude models on any surface when the task is complex, multi-file, ambiguous, or agentic. Not needed for simple one-shot tasks.
