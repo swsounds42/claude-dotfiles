@@ -240,7 +240,7 @@ server version. **Modified:** each is renamed with a `cdt-` prefix
 `cdt-troubleshooting`), folder and frontmatter `name:`, and each `SKILL.md`
 carries an HTML comment recording that change. Nothing else changed. The
 server itself isn't vendored: `settings.json.template` runs
-`npx -y chrome-devtools-mcp@1.10.1 --no-usage-statistics --no-performance-crux`
+`npx -y chrome-devtools-mcp@1.10.1 --no-usage-statistics`
 with `CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS=1`.
 
 ## Hooks and root files
