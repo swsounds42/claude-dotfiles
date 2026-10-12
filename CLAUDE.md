@@ -117,13 +117,6 @@ When a user request matches an installed skill, **MUST invoke it automatically v
 | Applying Anthropic brand colors/typography | `brand-guidelines` |
 | Analyzing coding patterns and developer growth | `developer-growth-analysis` |
 | Creating skills and sharing on Slack | `skill-share` |
-| Building n8n workflows, designing automations in n8n | `n8n-workflow-patterns` |
-| Writing n8n expressions, {{}} syntax, $json/$node variables | `n8n-expression-syntax` |
-| Using n8n-mcp tools, searching nodes, managing workflows via MCP | `n8n-mcp-tools-expert` |
-| Fixing n8n validation errors, debugging workflow issues | `n8n-validation-expert` |
-| Configuring n8n nodes, operation-specific settings | `n8n-node-configuration` |
-| Writing JavaScript in n8n Code nodes | `n8n-code-javascript` |
-| Writing Python in n8n Code nodes | `n8n-code-python` |
 | Creating slide decks, presentations, pitch decks, visual HTML slides | `frontend-slides` |
 | Creating markdown-based developer presentations with Slidev | `slidev` |
 | Writing, fixing, improving, or adapting prompts for any AI tool (Cursor, GPT, Midjourney, etc.) | `prompt-master` |

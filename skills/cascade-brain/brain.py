@@ -658,7 +658,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     print("**Cross-check carefully against inventory** ({} installed). The `closest_installed` column".format(inventory.get("size", 0)))
     print("above is a heuristic hint — read the candidate's actual description to confirm redundancy.\n")
     print("**Cascade fit lens:** RevOps / sales analyst, daily tools = SF + marketing automation + call recording +")
-    print("Notion + Slack + Gmail + Calendar + GitHub. Writes content (samwarren.io). Builds n8n + Python")
+    print("Notion + Slack + Gmail + Calendar + GitHub. Writes content (samwarren.io). Builds Python + websites")
     print("automations. Bias toward skills that compound with what's installed, not parallel duplicates.\n")
     print("Render output as a single markdown table with columns:")
     print("`| Bucket | Repo | ★ | Why (or why not) | Notes |`")

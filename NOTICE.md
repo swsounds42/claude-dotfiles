@@ -25,7 +25,6 @@ advice.
 | 9 Anthropic commands (list below) | [anthropics/skills](https://github.com/anthropics/skills), copied from [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | Apache-2.0 | `commands/skill-resources/<name>/LICENSE.txt` |
 | 17 Composio commands (list below) | [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | Apache-2.0 | `licenses/Apache-2.0.txt` |
 | `commands/twitter-algorithm-optimizer.md` | [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | **AGPL-3.0** | `commands/skill-resources/twitter-algorithm-optimizer/LICENSE.txt` |
-| `commands/n8n-*.md` (7 commands) + `commands/skill-resources/n8n-*/` | [czlonkowski/n8n-skills](https://github.com/czlonkowski/n8n-skills) | MIT | `commands/skill-resources/n8n-*/LICENSE` |
 | `commands/prompt-master.md` + `commands/skill-resources/prompt-master/` | [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) | MIT | `commands/skill-resources/prompt-master/LICENSE` |
 | `commands/prompt-mini.md` + `commands/skill-resources/prompt-mini/` | [nidhinjs/prompt-mini](https://github.com/nidhinjs/prompt-mini) | MIT | `commands/skill-resources/prompt-mini/LICENSE` |
 | `skills/ui-ux-pro-max/`, `banner-design/`, `brand/`, `design/`, `design-system/`, `slides/`, `ui-styling/` | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | MIT | `skills/<name>/LICENSE` |
@@ -120,14 +119,6 @@ source)` in the frontmatter, so it's under the GNU Affero General Public
 License v3.0, not MIT. The full text is in
 `commands/skill-resources/twitter-algorithm-optimizer/LICENSE.txt`. If you
 copy or share this file, AGPL-3.0 terms apply to it.
-
-### n8n-skills
-
-MIT, Copyright (c) 2025 Romuald Członkowski. The seven `commands/n8n-*.md`
-files and their `commands/skill-resources/n8n-*/` folders are unmodified
-copies of upstream versions from October 2025 to January 2026. Later upstream
-versions add hooks adapted from n8n-io/skills under Apache-2.0. None of those
-are here.
 
 ### prompt-master and prompt-mini
 

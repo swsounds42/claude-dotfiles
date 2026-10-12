@@ -1,5 +1,5 @@
 {
-  "comment": "Manually-tracked installed sources that auto-detection can't see (plugin-loaded, ~/.agents/, ~/Downloads/_Archive/repos/, etc.). Format: array of 'owner/name' strings. Edit this file to keep cross-checks accurate. Also embedded in the 'Cascade Discovery Scan' claude.ai routine — refresh both when adding installs.",
+  "comment": "Manually-tracked installed sources that auto-detection can't see (plugin-loaded, ~/.agents/, ~/Downloads/_Archive/repos/, etc.). Format: array of 'owner/name' strings. Edit this file to keep cross-checks accurate. Also embedded in the 'Cascade Discovery Scan' claude.ai routine \u2014 refresh both when adding installs.",
   "installed": [
     "anthropics/skills",
     "googleworkspace/cli",
@@ -24,7 +24,7 @@
   "own": [
     "swsounds42/claude-dotfiles"
   ],
-  "own_comment": "Repos Sam authors — excluded from the freshness check (--check-updates) so it never flags his own commits as 'stale'. Owners swsounds42/* and swsounds/* are auto-excluded too; add cross-owner repos here.",
+  "own_comment": "Repos Sam authors \u2014 excluded from the freshness check (--check-updates) so it never flags his own commits as 'stale'. Owners swsounds42/* and swsounds/* are auto-excluded too; add cross-owner repos here.",
   "explored_not_integrated": {
     "comment": "Repos cloned/downloaded to ~/Downloads/_Archive/repos/ but not yet symlinked into ~/.claude/skills/. Track here so weekly discovery scan doesn't re-recommend them.",
     "repos": [
@@ -34,7 +34,6 @@
       "awesome-design-md",
       "claude-code-best-practice",
       "jarvis-personal-os",
-      "n8n-skills",
       "nelson",
       "ruflo",
       "disler/claude-code-hooks-multi-agent-observability"
