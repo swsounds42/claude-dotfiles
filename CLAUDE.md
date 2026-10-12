@@ -146,6 +146,12 @@ When a user request matches an installed skill, **MUST invoke it automatically v
 | React component API design, compound components, boolean-prop sprawl | `composition-patterns` |
 | Email deliverability, spam, SPF/DKIM/DMARC, bounces, CAN-SPAM/GDPR | `email-best-practices`; HTML email templates: `react-email` |
 | Vercel cost / performance from real metrics, "why is my Vercel bill high" | `vercel-optimize` |
+| Figma file to code, implement a Figma design, Code Connect, build a design library from Figma | `figma:figma-design-to-code` / `figma:figma-code-connect` / `figma:figma-generate-library` (Figma plugin; sign in via `/mcp` first) |
+| Supabase database, auth, RLS policies, Postgres schema or migrations, Supabase errors | `supabase:supabase` + `supabase:supabase-postgres-best-practices` |
+| Responsive layout check, "does this work on mobile", breakpoint sweep, find where a layout breaks | `responsiveness-check` (drives the Playwright MCP) |
+| Favicon, app icons, apple-touch-icon, web manifest, "favicon not showing" | `favicon-gen` |
+| Live Next.js dev-server errors, routes, logs, "why is my Next app broken locally" | next-devtools MCP (`mcp__next-devtools__*`) |
+| Cross-browser testing (Firefox/Safari), scripted browser flows on a site | Playwright MCP (`mcp__playwright__*`); Chrome-only debugging stays on `cdt-*` |
 | Stress-test a plan against project's domain language, build/maintain CONTEXT.md, capture ADRs as you decide | `grill-with-docs` skill — manual invocation via `/grill-with-docs` (skill has `disable-model-invocation: true`) |
 | Find refactor candidates, surface deepening opportunities, Ousterhout deep-module review, identify shallow modules earning their keep | `improve-codebase-architecture` skill |
 | "Be terse", "cut output tokens", "caveman mode", "talk like caveman", long debug sessions where output bloat is expensive | `caveman` skill (toggles persistent compressed-output mode; "stop caveman" to disable) |
